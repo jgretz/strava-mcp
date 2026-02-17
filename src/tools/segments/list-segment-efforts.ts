@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { defineTool } from '../types.ts';
 import { listSegmentEfforts as fetchSegmentEfforts } from '../../api/segments.ts';
-import { formatDuration } from '../format.ts';
 
 export const listSegmentEfforts = defineTool({
   name: 'list_segment_efforts',
@@ -21,22 +20,8 @@ export const listSegmentEfforts = defineTool({
       };
     }
 
-    const efforts = result.value;
-    if (efforts.length === 0) {
-      return { content: [{ type: 'text' as const, text: 'No efforts found.' }] };
-    }
-
-    const text = efforts
-      .map((e) => {
-        const date = new Date(e.start_date_local).toLocaleDateString();
-        const ranks = [
-          e.pr_rank ? `PR #${e.pr_rank}` : null,
-          e.kom_rank ? `KOM #${e.kom_rank}` : null,
-        ].filter(Boolean).join(', ');
-        return `- ${date}: ${formatDuration(e.elapsed_time)}${ranks ? ` (${ranks})` : ''} — ID: ${e.id}`;
-      })
-      .join('\n');
-
-    return { content: [{ type: 'text' as const, text }] };
+    return {
+      content: [{ type: 'text' as const, text: JSON.stringify(result.value, null, 2) }],
+    };
   },
 });

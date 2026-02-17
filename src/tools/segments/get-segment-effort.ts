@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { defineTool } from '../types.ts';
 import { getSegmentEffort as fetchSegmentEffort } from '../../api/segments.ts';
-import { formatDuration } from '../format.ts';
 
 export const getSegmentEffort = defineTool({
   name: 'get_segment_effort',
@@ -18,28 +17,8 @@ export const getSegmentEffort = defineTool({
       };
     }
 
-    const e = result.value;
-    const lines = [
-      `# ${e.name}`,
-      `Date: ${new Date(e.start_date_local).toLocaleString()}`,
-      `Elapsed Time: ${formatDuration(e.elapsed_time)}`,
-      `Moving Time: ${formatDuration(e.moving_time)}`,
-      `Distance: ${(e.distance / 1000).toFixed(2)} km`,
-      e.average_heartrate != null ? `Average HR: ${e.average_heartrate} bpm` : null,
-      e.max_heartrate != null ? `Max HR: ${e.max_heartrate} bpm` : null,
-      e.average_watts != null ? `Average Watts: ${e.average_watts}` : null,
-      e.kom_rank != null ? `KOM Rank: #${e.kom_rank}` : null,
-      e.pr_rank != null ? `PR Rank: #${e.pr_rank}` : null,
-    ];
-
-    if (e.achievements.length > 0) {
-      lines.push('', '## Achievements');
-      for (const a of e.achievements) {
-        lines.push(`- ${a.type} (rank ${a.rank})`);
-      }
-    }
-
-    const text = lines.filter((l) => l !== null).join('\n');
-    return { content: [{ type: 'text' as const, text }] };
+    return {
+      content: [{ type: 'text' as const, text: JSON.stringify(result.value, null, 2) }],
+    };
   },
 });

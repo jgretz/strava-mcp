@@ -17,18 +17,8 @@ export const getGear = defineTool({
       };
     }
 
-    const g = result.value;
-    const lines = [
-      `# ${g.name}`,
-      `Brand: ${g.brand_name || 'unknown'}`,
-      `Model: ${g.model_name || 'unknown'}`,
-      g.description ? `Description: ${g.description}` : null,
-      `Distance: ${(g.distance / 1000).toFixed(0)} km`,
-      `Primary: ${g.primary}`,
-      `ID: ${g.id}`,
-    ];
-
-    const text = lines.filter((l) => l !== null).join('\n');
-    return { content: [{ type: 'text' as const, text }] };
+    return {
+      content: [{ type: 'text' as const, text: JSON.stringify(result.value, null, 2) }],
+    };
   },
 });

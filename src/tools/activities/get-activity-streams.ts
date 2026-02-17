@@ -24,23 +24,8 @@ export const getActivityStreams = defineTool({
       };
     }
 
-    const streams = result.value;
-    if (streams.length === 0) {
-      return { content: [{ type: 'text' as const, text: 'No stream data available.' }] };
-    }
-
-    const lines = [`# Activity ${activityId} Streams`, ''];
-    for (const stream of streams) {
-      const data = stream.data;
-      const nums = data.filter((d): d is number => typeof d === 'number');
-      const min = nums.reduce((a, b) => Math.min(a, b), Infinity);
-      const max = nums.reduce((a, b) => Math.max(a, b), -Infinity);
-      const avg = nums.reduce((sum, v) => sum + v, 0) / nums.length;
-      lines.push(`## ${stream.type}`);
-      lines.push(`Points: ${data.length}, Min: ${min.toFixed(1)}, Max: ${max.toFixed(1)}, Avg: ${avg.toFixed(1)}`);
-      lines.push('');
-    }
-
-    return { content: [{ type: 'text' as const, text: lines.join('\n') }] };
+    return {
+      content: [{ type: 'text' as const, text: JSON.stringify(result.value, null, 2) }],
+    };
   },
 });

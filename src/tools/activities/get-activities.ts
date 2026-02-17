@@ -1,8 +1,6 @@
 import { z } from 'zod';
 import { defineTool } from '../types.ts';
 import { listActivities } from '../../api/activities.ts';
-import { ACTIVITY_TYPE_LABELS } from '../../config.ts';
-import { formatDuration, formatDistance } from '../format.ts';
 
 export const getActivities = defineTool({
   name: 'get_activities',
@@ -23,19 +21,8 @@ export const getActivities = defineTool({
       };
     }
 
-    const activities = result.value;
-    if (activities.length === 0) {
-      return { content: [{ type: 'text' as const, text: 'No activities found.' }] };
-    }
-
-    const text = activities
-      .map((a) => {
-        const type = ACTIVITY_TYPE_LABELS[a.sport_type] ?? a.sport_type;
-        const date = new Date(a.start_date_local).toLocaleDateString();
-        return `- ${a.name} (${type}) — ${date} — ${formatDistance(a.distance)}, ${formatDuration(a.moving_time)}, ${a.total_elevation_gain}m elev — ID: ${a.id}`;
-      })
-      .join('\n');
-
-    return { content: [{ type: 'text' as const, text }] };
+    return {
+      content: [{ type: 'text' as const, text: JSON.stringify(result.value, null, 2) }],
+    };
   },
 });

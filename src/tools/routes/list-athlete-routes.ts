@@ -27,18 +27,8 @@ export const listAthleteRoutes = defineTool({
       };
     }
 
-    const routes = result.value;
-    if (routes.length === 0) {
-      return { content: [{ type: 'text' as const, text: 'No routes found.' }] };
-    }
-
-    const text = routes
-      .map((r) => {
-        const type = r.type === 1 ? 'Ride' : r.type === 2 ? 'Run' : String(r.type);
-        return `- ${r.name} (${type}) — ${(r.distance / 1000).toFixed(2)} km, ${r.elevation_gain.toFixed(0)}m elev — ID: ${r.id}`;
-      })
-      .join('\n');
-
-    return { content: [{ type: 'text' as const, text }] };
+    return {
+      content: [{ type: 'text' as const, text: JSON.stringify(result.value, null, 2) }],
+    };
   },
 });

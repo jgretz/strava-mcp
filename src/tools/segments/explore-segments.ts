@@ -24,17 +24,8 @@ export const exploreSegments = defineTool({
       };
     }
 
-    const segments = result.value.segments;
-    if (segments.length === 0) {
-      return { content: [{ type: 'text' as const, text: 'No segments found in this area.' }] };
-    }
-
-    const text = segments
-      .map((s) =>
-        `- ${s.name} — ${(s.distance / 1000).toFixed(2)} km, ${s.avg_grade}% avg grade, ${s.elev_difference}m elev, cat ${s.climb_category} (${s.climb_category_desc}) — ID: ${s.id}`,
-      )
-      .join('\n');
-
-    return { content: [{ type: 'text' as const, text }] };
+    return {
+      content: [{ type: 'text' as const, text: JSON.stringify(result.value, null, 2) }],
+    };
   },
 });
