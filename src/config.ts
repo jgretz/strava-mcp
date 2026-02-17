@@ -1,0 +1,62 @@
+export const STRAVA_BASE_URL = 'https://www.strava.com/api/v3';
+export const STRAVA_AUTH_URL = 'https://www.strava.com/oauth/authorize';
+export const STRAVA_TOKEN_URL = 'https://www.strava.com/oauth/token';
+
+export const ACTIVITY_TYPE_LABELS: Record<string, string> = {
+  AlpineSki: 'Alpine Ski',
+  BackcountrySki: 'Backcountry Ski',
+  Canoeing: 'Canoeing',
+  Crossfit: 'Crossfit',
+  EBikeRide: 'E-Bike Ride',
+  Elliptical: 'Elliptical',
+  Golf: 'Golf',
+  GravelRide: 'Gravel Ride',
+  Handcycle: 'Handcycle',
+  Hike: 'Hike',
+  IceSkate: 'Ice Skate',
+  InlineSkate: 'Inline Skate',
+  Kayaking: 'Kayaking',
+  Kitesurf: 'Kitesurf',
+  MountainBikeRide: 'Mountain Bike Ride',
+  NordicSki: 'Nordic Ski',
+  Ride: 'Ride',
+  RockClimbing: 'Rock Climbing',
+  RollerSki: 'Roller Ski',
+  Rowing: 'Rowing',
+  Run: 'Run',
+  Sail: 'Sail',
+  Skateboard: 'Skateboard',
+  Snowboard: 'Snowboard',
+  Snowshoe: 'Snowshoe',
+  Soccer: 'Soccer',
+  StairStepper: 'Stair Stepper',
+  StandUpPaddling: 'Stand Up Paddling',
+  Surfing: 'Surfing',
+  Swim: 'Swim',
+  TrailRun: 'Trail Run',
+  Velomobile: 'Velomobile',
+  VirtualRide: 'Virtual Ride',
+  VirtualRun: 'Virtual Run',
+  Walk: 'Walk',
+  WeightTraining: 'Weight Training',
+  Wheelchair: 'Wheelchair',
+  Windsurf: 'Windsurf',
+  Workout: 'Workout',
+  Yoga: 'Yoga',
+} as const;
+
+export const STREAM_KEYS = [
+  'time',
+  'distance',
+  'latlng',
+  'altitude',
+  'velocity_smooth',
+  'heartrate',
+  'cadence',
+  'watts',
+  'temp',
+  'moving',
+  'grade_smooth',
+] as const;
+
+export type StreamKey = (typeof STREAM_KEYS)[number];
