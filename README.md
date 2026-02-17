@@ -24,6 +24,8 @@ Set these environment variables:
 | `STRAVA_CLIENT_ID`    | Strava API client ID     | Yes      |
 | `STRAVA_CLIENT_SECRET`| Strava API client secret | Yes      |
 
+Clone the repo and replace `/path/to/strava-mcp` below with your actual clone location.
+
 ### Claude Desktop
 
 Add to `claude_desktop_config.json`:
@@ -32,8 +34,8 @@ Add to `claude_desktop_config.json`:
 {
   "mcpServers": {
     "strava": {
-      "command": "bunx",
-      "args": ["--bun", "github:jgretz/strava-mcp"],
+      "command": "bun",
+      "args": ["run", "/path/to/strava-mcp/src/index.ts"],
       "env": {
         "STRAVA_CLIENT_ID": "your-client-id",
         "STRAVA_CLIENT_SECRET": "your-client-secret"
@@ -51,8 +53,8 @@ Add to `.mcp.json`:
 {
   "mcpServers": {
     "strava": {
-      "command": "bunx",
-      "args": ["--bun", "github:jgretz/strava-mcp"],
+      "command": "bun",
+      "args": ["run", "/path/to/strava-mcp/src/index.ts"],
       "env": {
         "STRAVA_CLIENT_ID": "your-client-id",
         "STRAVA_CLIENT_SECRET": "your-client-secret"
