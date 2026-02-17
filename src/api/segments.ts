@@ -17,7 +17,7 @@ export function exploreSegments(opts: ExploreOpts): Promise<Result<ExploreSegmen
   if (opts.activityType) params.activity_type = opts.activityType;
   if (opts.minClimbCategory !== undefined) params.min_cat = String(opts.minClimbCategory);
   if (opts.maxClimbCategory !== undefined) params.max_cat = String(opts.maxClimbCategory);
-  return stravaGet<ExploreResponse>('/segments/explore', params);
+  return stravaGet<ExploreSegmentsResponse>('/segments/explore', params);
 }
 
 export function getSegmentEffort(id: number): Promise<Result<SegmentEffort, string>> {
