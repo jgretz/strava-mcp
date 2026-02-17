@@ -76,7 +76,8 @@ Add to `.mcp.json`:
 | `get_athlete_profile`  | Get the authenticated athlete's profile information.                              |
 | `get_athlete_stats`    | Get activity statistics for an athlete grouped by sport and time period.          |
 | `get_athlete_zones`    | Get the authenticated athlete's heart rate and power zones.                       |
-| `get_gear`             | Get details about a piece of gear (shoe or bike) by ID.                           |
+| `get_gear`             | Get details about one or more pieces of gear by ID. Works for active and retired gear. |
+| `list_athlete_gear`    | List active gear (bikes and shoes) for the authenticated athlete.                 |
 | `get_segment`          | Get detailed information about a Strava segment.                                  |
 | `explore_segments`     | Search for Strava segments within a geographic bounding box.                      |
 | `get_segment_effort`   | Get details about a specific segment effort.                                      |

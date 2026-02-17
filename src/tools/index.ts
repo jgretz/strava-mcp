@@ -9,6 +9,7 @@ import { getAthleteProfile } from './athlete/get-athlete-profile.ts';
 import { getAthleteStats } from './athlete/get-athlete-stats.ts';
 import { getAthleteZones } from './athlete/get-athlete-zones.ts';
 import { getGear } from './athlete/get-gear.ts';
+import { listAthleteGear } from './athlete/list-athlete-gear.ts';
 import { getSegment } from './segments/get-segment.ts';
 import { exploreSegments } from './segments/explore-segments.ts';
 import { getSegmentEffort } from './segments/get-segment-effort.ts';
@@ -28,6 +29,7 @@ export const tools: McpTool[] = [
   getAthleteStats,
   getAthleteZones,
   getGear,
+  listAthleteGear,
   getSegment,
   exploreSegments,
   getSegmentEffort,
