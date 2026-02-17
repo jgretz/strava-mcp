@@ -33,7 +33,7 @@ Add to `claude_desktop_config.json`:
   "mcpServers": {
     "strava": {
       "command": "bunx",
-      "args": ["--bun", "strava-mcp"],
+      "args": ["--bun", "github:jgretz/strava-mcp"],
       "env": {
         "STRAVA_CLIENT_ID": "your-client-id",
         "STRAVA_CLIENT_SECRET": "your-client-secret"
@@ -52,7 +52,7 @@ Add to `.mcp.json`:
   "mcpServers": {
     "strava": {
       "command": "bunx",
-      "args": ["--bun", "strava-mcp"],
+      "args": ["--bun", "github:jgretz/strava-mcp"],
       "env": {
         "STRAVA_CLIENT_ID": "your-client-id",
         "STRAVA_CLIENT_SECRET": "your-client-secret"
