@@ -77,7 +77,7 @@ export async function authorize(): Promise<Result<{ token: AuthToken; athleteNam
     });
 
     const redirectUri = `http://localhost:${server.port}/callback`;
-    const authUrl = `${STRAVA_AUTH_URL}?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=read,profile:read_all,activity:read_all&approval_prompt=auto`;
+    const authUrl = `${STRAVA_AUTH_URL}?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&scope=read,profile:read_all,activity:read_all,activity:write&approval_prompt=auto`;
 
     // open browser
     Bun.$`open ${authUrl}`.catch(() => {
