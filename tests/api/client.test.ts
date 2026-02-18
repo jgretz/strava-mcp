@@ -1,7 +1,28 @@
 import { describe, it, expect, beforeEach, afterEach, mock } from 'bun:test';
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs';
+import { join } from 'node:path';
+import { homedir } from 'node:os';
 import { setToken, clearToken } from '../../src/auth/auth.ts';
 import { stravaGet, stravaGetText } from '../../src/api/client.ts';
 import type { AuthToken } from '../../src/types.ts';
+
+const TOKEN_PATH = join(homedir(), '.config', 'strava-mcp', 'auth.json');
+
+let savedTokenContents: string | null = null;
+
+function backupTokenFile(): void {
+  if (existsSync(TOKEN_PATH)) {
+    savedTokenContents = readFileSync(TOKEN_PATH, 'utf-8');
+    unlinkSync(TOKEN_PATH);
+  }
+}
+
+function restoreTokenFile(): void {
+  if (savedTokenContents) {
+    writeFileSync(TOKEN_PATH, savedTokenContents, 'utf-8');
+    savedTokenContents = null;
+  }
+}
 
 const validToken: AuthToken = {
   accessToken: 'test-token',
@@ -17,12 +38,14 @@ const savedSecret = process.env.STRAVA_CLIENT_SECRET;
 describe('stravaGet', () => {
   beforeEach(() => {
     clearToken();
+    backupTokenFile();
     delete process.env.STRAVA_CLIENT_ID;
     delete process.env.STRAVA_CLIENT_SECRET;
   });
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
+    restoreTokenFile();
     if (savedId) process.env.STRAVA_CLIENT_ID = savedId;
     else delete process.env.STRAVA_CLIENT_ID;
     if (savedSecret) process.env.STRAVA_CLIENT_SECRET = savedSecret;
@@ -42,7 +65,7 @@ describe('stravaGet', () => {
     globalThis.fetch = mock(async (_url: string | URL | Request, init?: RequestInit) => {
       capturedHeaders = init?.headers as Record<string, string>;
       return new Response(JSON.stringify({ id: 1 }), { status: 200 });
-    }) as typeof fetch;
+    }) as unknown as typeof fetch;
 
     await stravaGet('/athlete');
 
@@ -54,7 +77,7 @@ describe('stravaGet', () => {
 
     globalThis.fetch = mock(async () => {
       return new Response('Not Found', { status: 404 });
-    }) as typeof fetch;
+    }) as unknown as typeof fetch;
 
     const result = await stravaGet('/nonexistent');
 
@@ -69,7 +92,7 @@ describe('stravaGet', () => {
 
     globalThis.fetch = mock(async () => {
       return new Response(JSON.stringify({ id: 42, name: 'Test' }), { status: 200 });
-    }) as typeof fetch;
+    }) as unknown as typeof fetch;
 
     const result = await stravaGet<{ id: number; name: string }>('/test');
 
@@ -84,12 +107,14 @@ describe('stravaGet', () => {
 describe('stravaGetText', () => {
   beforeEach(() => {
     clearToken();
+    backupTokenFile();
     delete process.env.STRAVA_CLIENT_ID;
     delete process.env.STRAVA_CLIENT_SECRET;
   });
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
+    restoreTokenFile();
     if (savedId) process.env.STRAVA_CLIENT_ID = savedId;
     else delete process.env.STRAVA_CLIENT_ID;
     if (savedSecret) process.env.STRAVA_CLIENT_SECRET = savedSecret;
@@ -107,7 +132,7 @@ describe('stravaGetText', () => {
 
     globalThis.fetch = mock(async () => {
       return new Response('<gpx>data</gpx>', { status: 200 });
-    }) as typeof fetch;
+    }) as unknown as typeof fetch;
 
     const result = await stravaGetText('/routes/1/export_gpx');
 
@@ -122,7 +147,7 @@ describe('stravaGetText', () => {
 
     globalThis.fetch = mock(async () => {
       return new Response('Forbidden', { status: 403 });
-    }) as typeof fetch;
+    }) as unknown as typeof fetch;
 
     const result = await stravaGetText('/routes/1/export_gpx');
 

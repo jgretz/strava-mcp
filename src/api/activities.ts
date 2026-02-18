@@ -1,5 +1,5 @@
-import { stravaGet } from './client.ts';
-import type { Result, Activity, Lap, Stream } from '../types.ts';
+import { stravaGet, stravaPut } from './client.ts';
+import type { Result, Activity, UpdatableActivity, Lap, Stream } from '../types.ts';
 
 type ListActivitiesOpts = {
   page?: number;
@@ -30,4 +30,8 @@ export function getActivityStreams(id: number, keys: string[]): Promise<Result<S
 
 export function getActivityLaps(id: number): Promise<Result<Lap[], string>> {
   return stravaGet<Lap[]>(`/activities/${id}/laps`);
+}
+
+export function updateActivity(id: number, data: UpdatableActivity): Promise<Result<Activity, string>> {
+  return stravaPut<Activity>(`/activities/${id}`, data);
 }

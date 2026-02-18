@@ -5,6 +5,7 @@ import { getActivities } from './activities/get-activities.ts';
 import { getActivityDetails } from './activities/get-activity-details.ts';
 import { getActivityStreams } from './activities/get-activity-streams.ts';
 import { getActivityLaps } from './activities/get-activity-laps.ts';
+import { updateActivity } from './activities/update-activity.ts';
 import { getAthleteProfile } from './athlete/get-athlete-profile.ts';
 import { getAthleteStats } from './athlete/get-athlete-stats.ts';
 import { getAthleteZones } from './athlete/get-athlete-zones.ts';
@@ -25,6 +26,7 @@ export const tools: McpTool[] = [
   getActivityDetails,
   getActivityStreams,
   getActivityLaps,
+  updateActivity,
   getAthleteProfile,
   getAthleteStats,
   getAthleteZones,

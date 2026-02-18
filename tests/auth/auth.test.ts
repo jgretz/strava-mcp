@@ -94,7 +94,7 @@ describe('getToken', () => {
         refresh_token: 'new-refresh',
         expires_at: Math.floor(Date.now() / 1000) + 7200,
       }), { status: 200 });
-    }) as typeof fetch;
+    }) as unknown as typeof fetch;
 
     const result = await getToken();
 

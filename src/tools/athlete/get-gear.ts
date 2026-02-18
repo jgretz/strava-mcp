@@ -18,14 +18,13 @@ export const getGear = defineTool({
     const errors: string[] = [];
     const gear: unknown[] = [];
 
-    for (let i = 0; i < results.length; i++) {
-      const result = results[i];
+    results.forEach((result, i) => {
       if (result.ok) {
         gear.push(result.value);
       } else {
         errors.push(`${ids[i]}: ${result.error}`);
       }
-    }
+    });
 
     if (gear.length === 0) {
       return {

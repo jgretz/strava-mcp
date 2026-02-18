@@ -106,6 +106,16 @@ export type Activity = {
   map: ActivityMap | null;
 };
 
+export type UpdatableActivity = {
+  commute?: boolean;
+  trainer?: boolean;
+  hide_from_home?: boolean;
+  description?: string;
+  name?: string;
+  sport_type?: string;
+  gear_id?: string;
+};
+
 export type ActivityMap = {
   id: string;
   summary_polyline: string | null;

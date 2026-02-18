@@ -4,7 +4,7 @@ import type { Result } from '../types.ts';
 import { getToken, refreshAccessToken } from '../auth/auth.ts';
 
 type RequestOptions = {
-  method: 'GET' | 'POST';
+  method: 'GET' | 'POST' | 'PUT';
   path: string;
   params?: Record<string, string>;
   body?: unknown;
@@ -66,6 +66,10 @@ export async function stravaRequest<T>(opts: RequestOptions): Promise<Result<T, 
 
 export async function stravaGet<T>(path: string, params?: Record<string, string>): Promise<Result<T, string>> {
   return stravaRequest<T>({ method: 'GET', path, params });
+}
+
+export async function stravaPut<T>(path: string, body: unknown): Promise<Result<T, string>> {
+  return stravaRequest<T>({ method: 'PUT', path, body });
 }
 
 // raw text response (for GPX/TCX exports) with 401 retry
