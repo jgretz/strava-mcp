@@ -106,6 +106,23 @@ export type Activity = {
   map: ActivityMap | null;
 };
 
+export type ActivitySummary = Pick<Activity,
+  | 'id'
+  | 'name'
+  | 'sport_type'
+  | 'start_date_local'
+  | 'distance'
+  | 'moving_time'
+  | 'elapsed_time'
+  | 'average_heartrate'
+  | 'max_heartrate'
+  | 'average_speed'
+  | 'total_elevation_gain'
+  | 'description'
+  | 'gear_id'
+  | 'suffer_score'
+>;
+
 export type UpdatableActivity = {
   commute?: boolean;
   trainer?: boolean;
