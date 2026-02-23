@@ -36,3 +36,9 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # Claude working notes
 CLAUDE-WORKING.md
 .claude/hooks/.env
+.mcp.json
+.worksite/
+.claude/settings.local.json
+.claude/commands/commit.md
+.claude/rules/worksite-planning.md
+.claude/reviews/
