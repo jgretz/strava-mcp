@@ -123,6 +123,12 @@ export type ActivitySummary = Pick<Activity,
   | 'suffer_score'
 >;
 
+export type ActivityWithSplits = ActivitySummary & Pick<Activity,
+  | 'splits_metric'
+  | 'splits_standard'
+  | 'laps'
+>;
+
 export type UpdatableActivity = {
   commute?: boolean;
   trainer?: boolean;
