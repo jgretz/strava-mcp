@@ -3,7 +3,9 @@
     "allow": [
       "Bash(gh repo view:*)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "mcp__worksite__daemon_status",
+      "mcp__worksite__list_repos"
     ]
   }
 }
