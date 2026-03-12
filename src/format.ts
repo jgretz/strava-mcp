@@ -51,8 +51,12 @@ export function formatPace(metersPerSecond: number): string {
   if (metersPerSecond === 0) return "-";
 
   const secondsPerKm = 1000 / metersPerSecond;
-  const minutes = Math.floor(secondsPerKm / 60);
-  const seconds = Math.round(secondsPerKm % 60);
+  let minutes = Math.floor(secondsPerKm / 60);
+  let seconds = Math.round(secondsPerKm % 60);
+  if (seconds === 60) {
+    minutes++;
+    seconds = 0;
+  }
 
   return `${minutes}:${seconds.toString().padStart(2, "0")}/km`;
 }

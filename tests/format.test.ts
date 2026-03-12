@@ -83,6 +83,11 @@ describe("formatPace", () => {
     const result = formatPace(3.333);
     expect(result).toMatch(/\d+:\d+\/km/);
   });
+
+  it("handles edge case where seconds round to 60", () => {
+    // 3.336 m/s → 299.76 sec/km → rounds to 5:00/km, not 4:60/km
+    expect(formatPace(3.336)).toBe("5:00/km");
+  });
 });
 
 describe("formatSpeed", () => {

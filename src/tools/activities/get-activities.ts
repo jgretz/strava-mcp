@@ -50,16 +50,16 @@ export const getActivities = defineTool({
     }
 
     const level = detail ?? "basic";
-    const activities = result.value.map((a) => mapActivity(a, level));
 
     if (level === "basic") {
       const lines = result.value.map((a) => formatActivityLine(toSummary(a)));
-      const text = `## Activities (${activities.length})\n${lines.join("\n")}`;
+      const text = `## Activities (${result.value.length})\n${lines.join("\n")}`;
       return {
         content: [{ type: "text" as const, text: capOutput(text) }],
       };
     }
 
+    const activities = result.value.map((a) => mapActivity(a, level));
     return {
       content: [
         { type: "text" as const, text: capOutput(compactJson(activities)) },
