@@ -100,7 +100,8 @@ export function formatStreamSummary(streams: Stream[]): string {
       case "velocity_smooth": {
         const filtered = data.filter((d) => d > 0);
         if (filtered.length > 0) {
-          const avgPace = formatPace(avg(filtered));
+          const mean = filtered.reduce((a, b) => a + b, 0) / filtered.length;
+          const avgPace = formatPace(mean);
           const bestPace = formatPace(max(filtered));
           summaries.push(`Pace: avg ${avgPace}, best ${bestPace}`);
         }

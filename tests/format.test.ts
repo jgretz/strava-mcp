@@ -341,6 +341,23 @@ describe("formatStreamSummary", () => {
     expect(result).toContain("max 160");
   });
 
+  it("formats velocity_smooth stream with unrounded pace", () => {
+    const streams: Stream[] = [
+      {
+        type: "velocity_smooth",
+        data: [3.33, 3.33, 3.34],
+        series_type: "time",
+        original_size: 3,
+        resolution: "1",
+      },
+    ];
+
+    const result = formatStreamSummary(streams);
+    expect(result).toContain("Pace:");
+    // avg of [3.33, 3.33, 3.34] = ~3.333 m/s = 5:00/km, not 3 m/s = 5:33/km
+    expect(result).toContain("5:0");
+  });
+
   it("formats altitude stream with elevation gain/loss", () => {
     const streams: Stream[] = [
       {
