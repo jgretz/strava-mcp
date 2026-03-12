@@ -1,7 +1,9 @@
 import { z } from 'zod';
 import { defineTool } from '../types.ts';
 import { updateActivity as updateActivityApi } from '../../api/activities.ts';
+import { toSummary } from './map-activity.ts';
 import type { UpdatableActivity } from '../../types.ts';
+import { formatActivityLine, capOutput, compactJson } from '../../format.ts';
 
 export const updateActivity = defineTool({
   name: 'update_activity',
@@ -21,8 +23,9 @@ export const updateActivity = defineTool({
     commute: z.boolean().optional().describe('Whether this activity is a commute'),
     trainer: z.boolean().optional().describe('Whether this activity was on a trainer'),
     hideFromHome: z.boolean().optional().describe('Whether to hide from the home feed'),
+    detail: z.enum(['summary', 'full']).default('summary').describe('summary: one-liner showing updated activity (default). full: complete activity data as compact JSON.'),
   },
-  async handler({ activityId, name, description, sportType, gearId, commute, trainer, hideFromHome }) {
+  async handler({ activityId, name, description, sportType, gearId, commute, trainer, hideFromHome, detail }) {
     const data: UpdatableActivity = {};
     if (name !== undefined) data.name = name;
     if (description !== undefined) data.description = description;
@@ -40,8 +43,16 @@ export const updateActivity = defineTool({
       };
     }
 
+    if (detail === 'summary') {
+      const summary = toSummary(result.value);
+      const text = `Updated: ${formatActivityLine(summary)}`;
+      return {
+        content: [{ type: 'text' as const, text: capOutput(text) }],
+      };
+    }
+
     return {
-      content: [{ type: 'text' as const, text: JSON.stringify(result.value, null, 2) }],
+      content: [{ type: 'text' as const, text: capOutput(compactJson(result.value)) }],
     };
   },
 });
