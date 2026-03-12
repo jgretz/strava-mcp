@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { defineTool } from '../types.ts';
 import { exploreSegments as fetchExploreSegments } from '../../api/segments.ts';
+import { formatSegmentLine, capOutput, compactJson } from '../../format.ts';
 
 export const exploreSegments = defineTool({
   name: 'explore_segments',
@@ -13,8 +14,9 @@ export const exploreSegments = defineTool({
     activityType: z.enum(['running', 'riding']).optional().describe('Filter by activity type'),
     minClimbCategory: z.number().optional().describe('Minimum climb category (0–5)'),
     maxClimbCategory: z.number().optional().describe('Maximum climb category (0–5)'),
+    detail: z.enum(['summary', 'full']).default('summary').describe('summary: one-liner per segment (default). full: complete data as compact JSON.'),
   },
-  async handler({ swLat, swLng, neLat, neLng, activityType, minClimbCategory, maxClimbCategory }) {
+  async handler({ swLat, swLng, neLat, neLng, activityType, minClimbCategory, maxClimbCategory, detail }) {
     const bounds = `${swLat},${swLng},${neLat},${neLng}`;
     const result = await fetchExploreSegments({ bounds, activityType, minClimbCategory, maxClimbCategory });
     if (!result.ok) {
@@ -24,8 +26,16 @@ export const exploreSegments = defineTool({
       };
     }
 
+    if (detail === 'summary') {
+      const lines = result.value.segments.map((s) => formatSegmentLine(s));
+      const text = `## Segments (${result.value.segments.length})\n${lines.join('\n')}`;
+      return {
+        content: [{ type: 'text' as const, text: capOutput(text) }],
+      };
+    }
+
     return {
-      content: [{ type: 'text' as const, text: JSON.stringify(result.value, null, 2) }],
+      content: [{ type: 'text' as const, text: capOutput(compactJson(result.value)) }],
     };
   },
 });

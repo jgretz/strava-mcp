@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { defineTool } from '../types.ts';
 import { getActivity } from '../../api/activities.ts';
-import { mapActivity } from './map-activity.ts';
+import { mapActivity, toSummary } from './map-activity.ts';
+import { formatActivityLine, formatSplitLine, capOutput, compactJson } from '../../format.ts';
 
 export const getActivityDetails = defineTool({
   name: 'get_activity_details',
@@ -9,7 +10,7 @@ export const getActivityDetails = defineTool({
     'Get details of a Strava activity including gear, description, and all metrics.',
   inputSchema: {
     activityId: z.number().describe('Strava activity ID'),
-    detail: z.enum(['basic', 'splits', 'full']).optional().describe('Level of detail: "basic" returns key fields, "splits" returns key fields + splits/laps, "full" (default) returns all fields'),
+    detail: z.enum(['basic', 'splits', 'full']).optional().describe('Level of detail: "basic" returns one-liner, "splits" adds splits section, "full" (default) returns all fields as JSON'),
   },
   async handler({ activityId, detail }) {
     const result = await getActivity(activityId);
@@ -21,10 +22,29 @@ export const getActivityDetails = defineTool({
     }
 
     const level = detail ?? 'full';
-    const activity = mapActivity(result.value, level);
+    const activity = result.value;
+
+    if (level === 'basic') {
+      const summary = toSummary(activity);
+      return {
+        content: [{ type: 'text' as const, text: capOutput(formatActivityLine(summary)) }],
+      };
+    }
+
+    if (level === 'splits') {
+      const summary = toSummary(activity);
+      let text = formatActivityLine(summary);
+      if (activity.splits_metric && activity.splits_metric.length > 0) {
+        const splitLines = activity.splits_metric.map((s, i) => formatSplitLine(s, i + 1));
+        text += `\n### Splits\n${splitLines.join('\n')}`;
+      }
+      return {
+        content: [{ type: 'text' as const, text: capOutput(text) }],
+      };
+    }
 
     return {
-      content: [{ type: 'text' as const, text: JSON.stringify(activity, null, 2) }],
+      content: [{ type: 'text' as const, text: capOutput(compactJson(activity)) }],
     };
   },
 });
