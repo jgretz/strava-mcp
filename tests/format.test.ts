@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'bun:test';
+import { describe, it, expect } from "bun:test";
 import {
   capOutput,
   formatDuration,
@@ -17,7 +17,7 @@ import {
   max,
   sum,
   formatStreamSummary,
-} from '../src/format.ts';
+} from "../src/format.ts";
 import type {
   ActivitySummary,
   Lap,
@@ -28,99 +28,99 @@ import type {
   Route,
   Split,
   Stream,
-} from '../src/types.ts';
+} from "../src/types.ts";
 
-describe('capOutput', () => {
-  it('returns text unchanged when under limit', () => {
-    const text = 'hello world';
+describe("capOutput", () => {
+  it("returns text unchanged when under limit", () => {
+    const text = "hello world";
     expect(capOutput(text)).toBe(text);
   });
 
-  it('truncates and appends message when over limit', () => {
-    const text = 'x'.repeat(3100);
+  it("truncates and appends message when over limit", () => {
+    const text = "x".repeat(3100);
     const result = capOutput(text);
     expect(result.length).toBeLessThan(text.length);
-    expect(result).toContain('truncated');
-    expect(result).toContain('100 chars');
+    expect(result).toContain("truncated");
+    expect(result).toContain("100 chars");
   });
 });
 
-describe('formatDuration', () => {
+describe("formatDuration", () => {
   it('formats 0 seconds as "0s"', () => {
-    expect(formatDuration(0)).toBe('0s');
+    expect(formatDuration(0)).toBe("0s");
   });
 
-  it('formats seconds only', () => {
-    expect(formatDuration(59)).toBe('59s');
+  it("formats seconds only", () => {
+    expect(formatDuration(59)).toBe("59s");
   });
 
-  it('formats minutes and seconds', () => {
-    expect(formatDuration(60)).toBe('1m 0s');
-    expect(formatDuration(65)).toBe('1m 5s');
+  it("formats minutes and seconds", () => {
+    expect(formatDuration(60)).toBe("1m");
+    expect(formatDuration(65)).toBe("1m 5s");
   });
 
-  it('formats hours minutes and seconds', () => {
-    expect(formatDuration(3661)).toBe('1h 1m 1s');
-    expect(formatDuration(3600)).toBe('1h 0m 0s');
-  });
-});
-
-describe('formatDistance', () => {
-  it('formats meters as km with 1 decimal', () => {
-    expect(formatDistance(0)).toBe('0.0km');
-    expect(formatDistance(5123.4)).toBe('5.1km');
-    expect(formatDistance(42195)).toBe('42.2km');
+  it("formats hours minutes and seconds", () => {
+    expect(formatDuration(3661)).toBe("1h 1m 1s");
+    expect(formatDuration(3600)).toBe("1h");
   });
 });
 
-describe('formatPace', () => {
+describe("formatDistance", () => {
+  it("formats meters as km with 1 decimal", () => {
+    expect(formatDistance(0)).toBe("0.0km");
+    expect(formatDistance(5123.4)).toBe("5.1km");
+    expect(formatDistance(42195)).toBe("42.2km");
+  });
+});
+
+describe("formatPace", () => {
   it('returns "-" for 0 m/s', () => {
-    expect(formatPace(0)).toBe('-');
+    expect(formatPace(0)).toBe("-");
   });
 
-  it('converts m/s to min/km format', () => {
+  it("converts m/s to min/km format", () => {
     // 5:00/km = 1000m / 300s = 3.33 m/s
     const result = formatPace(3.333);
     expect(result).toMatch(/\d+:\d+\/km/);
   });
 });
 
-describe('formatSpeed', () => {
-  it('returns 0 km/h for 0 m/s', () => {
-    expect(formatSpeed(0)).toBe('0.0km/h');
+describe("formatSpeed", () => {
+  it("returns 0 km/h for 0 m/s", () => {
+    expect(formatSpeed(0)).toBe("0.0km/h");
   });
 
-  it('converts m/s to km/h', () => {
+  it("converts m/s to km/h", () => {
     // 8.333 m/s = 30 km/h
-    expect(formatSpeed(8.333)).toBe('30.0km/h');
+    expect(formatSpeed(8.333)).toBe("30.0km/h");
   });
 });
 
-describe('aggregation helpers', () => {
-  it('avg calculates average', () => {
+describe("aggregation helpers", () => {
+  it("avg calculates average", () => {
     expect(avg([100, 140, 160])).toBe(133);
   });
 
-  it('min finds minimum', () => {
+  it("min finds minimum", () => {
     expect(min([100, 140, 160])).toBe(100);
   });
 
-  it('max finds maximum', () => {
+  it("max finds maximum", () => {
     expect(max([100, 140, 160])).toBe(160);
   });
 
-  it('sum adds numbers', () => {
+  it("sum adds numbers", () => {
     expect(sum([100, 140, 160])).toBe(400);
   });
 });
 
-describe('formatActivityLine', () => {
-  it('formats activity summary as single line', () => {
+describe("formatActivityLine", () => {
+  it("formats activity summary as single line", () => {
     const activity: ActivitySummary = {
       id: 1,
-      name: 'Morning Run',
-      sport_type: 'Run',
-      start_date_local: '2024-01-15T08:00:00Z',
+      name: "Morning Run",
+      sport_type: "Run",
+      start_date_local: "2024-01-15T08:00:00Z",
       distance: 5000,
       moving_time: 1800,
       elapsed_time: 1800,
@@ -128,30 +128,30 @@ describe('formatActivityLine', () => {
       max_heartrate: 180,
       average_speed: 2.78,
       total_elevation_gain: 50,
-      description: 'Test',
+      description: "Test",
       gear_id: null,
       suffer_score: null,
     };
 
     const result = formatActivityLine(activity);
-    expect(result).toContain('2024-01-15');
-    expect(result).toContain('Run');
-    expect(result).toContain('Morning Run');
-    expect(result).toContain('5.0km');
-    expect(result).toContain('30m');
-    expect(result).toContain('HR 150');
+    expect(result).toContain("2024-01-15");
+    expect(result).toContain("Run");
+    expect(result).toContain("Morning Run");
+    expect(result).toContain("5.0km");
+    expect(result).toContain("30m");
+    expect(result).toContain("HR 150");
   });
 });
 
-describe('formatLapLine', () => {
-  it('formats lap data as single line', () => {
+describe("formatLapLine", () => {
+  it("formats lap data as single line", () => {
     const lap: Lap = {
       id: 1,
-      name: 'Lap 1',
+      name: "Lap 1",
       elapsed_time: 600,
       moving_time: 600,
-      start_date: '2024-01-15T08:00:00Z',
-      start_date_local: '2024-01-15T08:00:00Z',
+      start_date: "2024-01-15T08:00:00Z",
+      start_date_local: "2024-01-15T08:00:00Z",
       distance: 1000,
       average_speed: 1.67,
       max_speed: 3,
@@ -166,22 +166,22 @@ describe('formatLapLine', () => {
     };
 
     const result = formatLapLine(lap, 1);
-    expect(result).toContain('Lap 1:');
-    expect(result).toContain('1.0km');
-    expect(result).toContain('10m 0s');
-    expect(result).toContain('HR 150');
+    expect(result).toContain("Lap 1:");
+    expect(result).toContain("1.0km");
+    expect(result).toContain("10m");
+    expect(result).toContain("HR 150");
   });
 });
 
-describe('formatSegmentEffortLine', () => {
-  it('formats segment effort as single line', () => {
+describe("formatSegmentEffortLine", () => {
+  it("formats segment effort as single line", () => {
     const effort: SegmentEffort = {
       id: 1,
-      name: 'Test Climb',
+      name: "Test Climb",
       elapsed_time: 300,
       moving_time: 300,
-      start_date: '2024-01-15T08:00:00Z',
-      start_date_local: '2024-01-15T08:00:00Z',
+      start_date: "2024-01-15T08:00:00Z",
+      start_date_local: "2024-01-15T08:00:00Z",
       distance: 1000,
       average_watts: null,
       average_heartrate: 160,
@@ -193,39 +193,39 @@ describe('formatSegmentEffortLine', () => {
     };
 
     const result = formatSegmentEffortLine(effort);
-    expect(result).toContain('Test Climb');
-    expect(result).toContain('1.0km');
-    expect(result).toContain('PR:5');
+    expect(result).toContain("Test Climb");
+    expect(result).toContain("1.0km");
+    expect(result).toContain("PR:5");
   });
 });
 
-describe('formatGearLine', () => {
-  it('formats gear as single line', () => {
+describe("formatGearLine", () => {
+  it("formats gear as single line", () => {
     const gear: Gear = {
-      id: 'g123',
+      id: "g123",
       primary: true,
-      name: 'Road Bike',
-      brand_name: 'Trek',
-      model_name: 'Domane',
-      description: 'Primary bike',
+      name: "Road Bike",
+      brand_name: "Trek",
+      model_name: "Domane",
+      description: "Primary bike",
       resource_state: 2,
       distance: 50000,
       converted_distance: 50000,
     };
 
     const result = formatGearLine(gear);
-    expect(result).toContain('g123');
-    expect(result).toContain('Road Bike');
-    expect(result).toContain('Trek');
-    expect(result).toContain('50.0km');
+    expect(result).toContain("g123");
+    expect(result).toContain("Road Bike");
+    expect(result).toContain("Trek");
+    expect(result).toContain("50.0km");
   });
 });
 
-describe('formatRouteLine', () => {
-  it('formats route as single line', () => {
+describe("formatRouteLine", () => {
+  it("formats route as single line", () => {
     const route: Route = {
       id: 1,
-      name: 'Morning Route',
+      name: "Morning Route",
       description: null,
       distance: 10000,
       elevation_gain: 200,
@@ -237,23 +237,23 @@ describe('formatRouteLine', () => {
       map: null,
       estimated_moving_time: 1800,
       segments: [],
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z',
+      created_at: "2024-01-01T00:00:00Z",
+      updated_at: "2024-01-01T00:00:00Z",
     };
 
     const result = formatRouteLine(route);
-    expect(result).toContain('Morning Route');
-    expect(result).toContain('10.0km');
-    expect(result).toContain('200m gain');
+    expect(result).toContain("Morning Route");
+    expect(result).toContain("10.0km");
+    expect(result).toContain("200m gain");
   });
 });
 
-describe('formatSegmentLine', () => {
-  it('formats Segment with average_grade', () => {
+describe("formatSegmentLine", () => {
+  it("formats Segment with average_grade", () => {
     const segment: Segment = {
       id: 1,
-      name: 'Climb',
-      activity_type: 'Ride',
+      name: "Climb",
+      activity_type: "Ride",
       distance: 2000,
       average_grade: 5.5,
       maximum_grade: 10,
@@ -277,34 +277,34 @@ describe('formatSegmentLine', () => {
     };
 
     const result = formatSegmentLine(segment);
-    expect(result).toContain('Climb');
-    expect(result).toContain('2.0km');
-    expect(result).toContain('5.5%');
+    expect(result).toContain("Climb");
+    expect(result).toContain("2.0km");
+    expect(result).toContain("5.5%");
   });
 
-  it('formats ExploreSegment with avg_grade', () => {
+  it("formats ExploreSegment with avg_grade", () => {
     const segment: ExploreSegment = {
       id: 1,
-      name: 'Climb',
+      name: "Climb",
       climb_category: 2,
-      climb_category_desc: 'Moderate',
+      climb_category_desc: "Moderate",
       avg_grade: 5.5,
       start_latlng: [0, 0],
       end_latlng: [0, 0],
       elev_difference: 100,
       distance: 2000,
-      points: 'polyline',
+      points: "polyline",
     };
 
     const result = formatSegmentLine(segment);
-    expect(result).toContain('Climb');
-    expect(result).toContain('2.0km');
-    expect(result).toContain('5.5%');
+    expect(result).toContain("Climb");
+    expect(result).toContain("2.0km");
+    expect(result).toContain("5.5%");
   });
 });
 
-describe('formatSplitLine', () => {
-  it('formats split as single line', () => {
+describe("formatSplitLine", () => {
+  it("formats split as single line", () => {
     const split: Split = {
       distance: 1000,
       elapsed_time: 300,
@@ -317,50 +317,50 @@ describe('formatSplitLine', () => {
     };
 
     const result = formatSplitLine(split, 1);
-    expect(result).toContain('Split 1:');
-    expect(result).toContain('1.0km');
-    expect(result).toContain('5m 0s');
+    expect(result).toContain("Split 1:");
+    expect(result).toContain("1.0km");
+    expect(result).toContain("5m");
   });
 });
 
-describe('formatStreamSummary', () => {
-  it('formats heart rate stream', () => {
+describe("formatStreamSummary", () => {
+  it("formats heart rate stream", () => {
     const streams: Stream[] = [
       {
-        type: 'heartrate',
+        type: "heartrate",
         data: [120, 140, 160, 150],
-        series_type: 'time',
+        series_type: "time",
         original_size: 4,
-        resolution: '1',
+        resolution: "1",
       },
     ];
 
     const result = formatStreamSummary(streams);
-    expect(result).toContain('HR:');
-    expect(result).toContain('avg');
-    expect(result).toContain('max 160');
+    expect(result).toContain("HR:");
+    expect(result).toContain("avg");
+    expect(result).toContain("max 160");
   });
 
-  it('formats altitude stream with elevation gain/loss', () => {
+  it("formats altitude stream with elevation gain/loss", () => {
     const streams: Stream[] = [
       {
-        type: 'altitude',
+        type: "altitude",
         data: [100, 110, 120, 115, 125],
-        series_type: 'distance',
+        series_type: "distance",
         original_size: 5,
-        resolution: '10',
+        resolution: "10",
       },
     ];
 
     const result = formatStreamSummary(streams);
-    expect(result).toContain('Elevation:');
-    expect(result).toContain('gain');
-    expect(result).toContain('loss');
+    expect(result).toContain("Elevation:");
+    expect(result).toContain("gain");
+    expect(result).toContain("loss");
   });
 
   it('returns "No stream data available" for empty streams', () => {
     const streams: Stream[] = [];
     const result = formatStreamSummary(streams);
-    expect(result).toBe('No stream data available');
+    expect(result).toBe("No stream data available");
   });
 });

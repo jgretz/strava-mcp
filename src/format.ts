@@ -10,11 +10,14 @@ import type {
   Stream,
   AthleteStats,
   ZoneRange,
-} from './types.ts';
+} from "./types.ts";
 
 export const MAX_OUTPUT_CHARS = 3000;
 
-export function capOutput(text: string, max: number = MAX_OUTPUT_CHARS): string {
+export function capOutput(
+  text: string,
+  max: number = MAX_OUTPUT_CHARS,
+): string {
   if (text.length <= max) return text;
   const truncated = text.length - max;
   return `${text.slice(0, max)}\n... truncated (${truncated} chars). Use detail:'full' or narrow your query.`;
@@ -26,7 +29,7 @@ export function compactJson(data: unknown): string {
 
 // Basic converters
 export function formatDuration(seconds: number): string {
-  if (seconds === 0) return '0s';
+  if (seconds === 0) return "0s";
 
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
@@ -37,7 +40,7 @@ export function formatDuration(seconds: number): string {
   if (minutes > 0) parts.push(`${minutes}m`);
   if (secs > 0 || parts.length === 0) parts.push(`${secs}s`);
 
-  return parts.join(' ');
+  return parts.join(" ");
 }
 
 export function formatDistance(meters: number): string {
@@ -45,13 +48,13 @@ export function formatDistance(meters: number): string {
 }
 
 export function formatPace(metersPerSecond: number): string {
-  if (metersPerSecond === 0) return '-';
+  if (metersPerSecond === 0) return "-";
 
   const secondsPerKm = 1000 / metersPerSecond;
   const minutes = Math.floor(secondsPerKm / 60);
   const seconds = Math.round(secondsPerKm % 60);
 
-  return `${minutes}:${seconds.toString().padStart(2, '0')}/km`;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}/km`;
 }
 
 export function formatSpeed(metersPerSecond: number): string {
@@ -85,23 +88,25 @@ export function formatStreamSummary(streams: Stream[]): string {
     if (!data || data.length === 0) continue;
 
     switch (stream.type) {
-      case 'heartrate': {
+      case "heartrate": {
         const filtered = data.filter((d) => d > 0);
         if (filtered.length > 0) {
-          summaries.push(`HR: avg ${avg(filtered)} bpm, max ${max(filtered)} bpm`);
+          summaries.push(
+            `HR: avg ${avg(filtered)} bpm, max ${max(filtered)} bpm`,
+          );
         }
         break;
       }
-      case 'velocity_smooth': {
+      case "velocity_smooth": {
         const filtered = data.filter((d) => d > 0);
         if (filtered.length > 0) {
-          const avgPace = formatPace(avg(filtered) / 100);
-          const bestPace = formatPace(max(filtered) / 100);
+          const avgPace = formatPace(avg(filtered));
+          const bestPace = formatPace(max(filtered));
           summaries.push(`Pace: avg ${avgPace}, best ${bestPace}`);
         }
         break;
       }
-      case 'altitude': {
+      case "altitude": {
         let elevGain = 0;
         let elevLoss = 0;
         for (let i = 1; i < data.length; i++) {
@@ -116,21 +121,23 @@ export function formatStreamSummary(streams: Stream[]): string {
         }
         break;
       }
-      case 'watts': {
+      case "watts": {
         const filtered = data.filter((d) => d > 0);
         if (filtered.length > 0) {
           summaries.push(`Power: avg ${avg(filtered)}w, max ${max(filtered)}w`);
         }
         break;
       }
-      case 'cadence': {
+      case "cadence": {
         const filtered = data.filter((d) => d > 0);
         if (filtered.length > 0) {
-          summaries.push(`Cadence: avg ${avg(filtered)} rpm, max ${max(filtered)} rpm`);
+          summaries.push(
+            `Cadence: avg ${avg(filtered)} rpm, max ${max(filtered)} rpm`,
+          );
         }
         break;
       }
-      case 'temp': {
+      case "temp": {
         const filtered = data.filter((d) => d > -50);
         if (filtered.length > 0) {
           summaries.push(
@@ -143,17 +150,17 @@ export function formatStreamSummary(streams: Stream[]): string {
   }
 
   return summaries.length > 0
-    ? summaries.join('\n')
-    : 'No stream data available';
+    ? summaries.join("\n")
+    : "No stream data available";
 }
 
 // Domain formatters
 export function formatActivityLine(a: ActivitySummary): string {
-  const date = new Date(a.start_date_local).toISOString().split('T')[0];
+  const date = new Date(a.start_date_local).toISOString().split("T")[0];
   const distance = formatDistance(a.distance);
   const duration = formatDuration(a.moving_time);
-  const hr = a.average_heartrate ? Math.round(a.average_heartrate) : '-';
-  const score = a.suffer_score ?? '-';
+  const hr = a.average_heartrate ? Math.round(a.average_heartrate) : "-";
+  const score = a.suffer_score ?? "-";
 
   return `${date} | ${a.sport_type} | ${a.name} | ${distance} | ${duration} | HR ${hr} | suffer:${score}`;
 }
@@ -162,7 +169,7 @@ export function formatLapLine(lap: Lap, i: number): string {
   const distance = formatDistance(lap.distance);
   const duration = formatDuration(lap.moving_time);
   const pace = formatPace(lap.average_speed);
-  const hr = lap.average_heartrate ? Math.round(lap.average_heartrate) : '-';
+  const hr = lap.average_heartrate ? Math.round(lap.average_heartrate) : "-";
 
   return `Lap ${i}: ${distance} | ${duration} | ${pace} | HR ${hr}`;
 }
@@ -171,8 +178,8 @@ export function formatSegmentEffortLine(e: SegmentEffort): string {
   const distance = formatDistance(e.distance);
   const duration = formatDuration(e.moving_time);
   const pace = formatPace(e.moving_time > 0 ? e.distance / e.moving_time : 0);
-  const hr = e.average_heartrate ? Math.round(e.average_heartrate) : '-';
-  const pr = e.pr_rank ?? '-';
+  const hr = e.average_heartrate ? Math.round(e.average_heartrate) : "-";
+  const pr = e.pr_rank ?? "-";
 
   return `${e.name} | ${distance} | ${duration} | ${pace} | HR ${hr} | PR:${pr}`;
 }
@@ -190,12 +197,10 @@ export function formatRouteLine(r: Route): string {
   return `${r.name} | ${distance} | ${gain}m gain | ${time}`;
 }
 
-export function formatSegmentLine(
-  s: Segment | ExploreSegment,
-): string {
+export function formatSegmentLine(s: Segment | ExploreSegment): string {
   const distance = formatDistance(s.distance);
   const grade =
-    'average_grade' in s ? s.average_grade.toFixed(1) : s.avg_grade.toFixed(1);
+    "average_grade" in s ? s.average_grade.toFixed(1) : s.avg_grade.toFixed(1);
 
   return `${s.name} | ${distance} | ${grade}% | cat:${s.climb_category}`;
 }
@@ -203,47 +208,17 @@ export function formatSegmentLine(
 export function formatSplitLine(s: Split, i: number): string {
   const distance = formatDistance(s.distance);
   const duration = formatDuration(s.moving_time);
-  const pace = formatPace(
-    s.moving_time > 0 ? s.distance / s.moving_time : 0,
-  );
-  const hr = s.average_heartrate ? Math.round(s.average_heartrate) : '-';
+  const pace = formatPace(s.moving_time > 0 ? s.distance / s.moving_time : 0);
+  const hr = s.average_heartrate ? Math.round(s.average_heartrate) : "-";
 
   return `Split ${i}: ${distance} | ${duration} | ${pace} | HR ${hr}`;
 }
 
 // Athlete formatters
-export function formatAthleteProfileSummary(athlete: {
-  firstname: string;
-  lastname: string;
-  city: string | null;
-  state: string | null;
-  country: string | null;
-  weight: number | null;
-  ftp: number | null;
-  premium: boolean;
-  summit: boolean;
-  bikes: Gear[];
-  shoes: Gear[];
-}): string {
-  const location =
-    [athlete.city, athlete.state, athlete.country].filter(Boolean).join(', ') ||
-    'Unknown';
-  const weight = athlete.weight ? `${athlete.weight}kg` : '-';
-  const ftp = athlete.ftp ? `${athlete.ftp}w` : '-';
-
-  return (
-    `## ${athlete.firstname} ${athlete.lastname}\n` +
-    `Location: ${location}\n` +
-    `Weight: ${weight} | FTP: ${ftp}\n` +
-    `Premium: ${athlete.premium} | Summit: ${athlete.summit}\n` +
-    `Bikes: ${athlete.bikes.length} | Shoes: ${athlete.shoes.length}`
-  );
-}
-
 export function formatAthleteStatsSummary(stats: AthleteStats): string {
   const sections = [
     {
-      title: 'Recent',
+      title: "Recent",
       data: {
         Ride: stats.recent_ride_totals,
         Run: stats.recent_run_totals,
@@ -251,7 +226,7 @@ export function formatAthleteStatsSummary(stats: AthleteStats): string {
       },
     },
     {
-      title: 'YTD',
+      title: "YTD",
       data: {
         Ride: stats.ytd_ride_totals,
         Run: stats.ytd_run_totals,
@@ -259,7 +234,7 @@ export function formatAthleteStatsSummary(stats: AthleteStats): string {
       },
     },
     {
-      title: 'All-time',
+      title: "All-time",
       data: {
         Ride: stats.all_ride_totals,
         Run: stats.all_run_totals,
@@ -280,7 +255,7 @@ export function formatAthleteStatsSummary(stats: AthleteStats): string {
     }
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 export function formatZonesSummary(
@@ -289,7 +264,7 @@ export function formatZonesSummary(
 ): string {
   const lines: string[] = [];
 
-  lines.push('## HR Zones');
+  lines.push("## HR Zones");
   const hrZones = heart_rate.zones;
   if (hrZones && hrZones.length > 0) {
     for (let i = 0; i < hrZones.length; i++) {
@@ -301,7 +276,7 @@ export function formatZonesSummary(
   if (power) {
     const pwZones = power.zones;
     if (pwZones && pwZones.length > 0) {
-      lines.push('\n## Power Zones');
+      lines.push("\n## Power Zones");
       for (let i = 0; i < pwZones.length; i++) {
         const z = pwZones[i]!;
         lines.push(`Zone ${i + 1}: ${z.min}-${z.max}w`);
@@ -309,5 +284,5 @@ export function formatZonesSummary(
     }
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
