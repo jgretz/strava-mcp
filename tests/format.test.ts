@@ -145,6 +145,29 @@ describe("formatActivityLine", () => {
     expect(result).toContain("5.0km");
     expect(result).toContain("30m");
     expect(result).toContain("HR 150");
+    expect(result).toContain("— Test");
+  });
+
+  it("omits description when null", () => {
+    const activity: ActivitySummary = {
+      id: 1,
+      name: "Morning Run",
+      sport_type: "Run",
+      start_date_local: "2024-01-15T08:00:00Z",
+      distance: 5000,
+      moving_time: 1800,
+      elapsed_time: 1800,
+      average_heartrate: 150,
+      max_heartrate: 180,
+      average_speed: 2.78,
+      total_elevation_gain: 50,
+      description: null,
+      gear_id: null,
+      suffer_score: null,
+    };
+
+    const result = formatActivityLine(activity);
+    expect(result).not.toContain("—");
   });
 });
 

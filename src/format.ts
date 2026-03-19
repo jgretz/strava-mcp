@@ -167,7 +167,9 @@ export function formatActivityLine(a: ActivitySummary): string {
   const hr = a.average_heartrate ? Math.round(a.average_heartrate) : "-";
   const score = a.suffer_score ?? "-";
 
-  return `${date} | ${a.sport_type} | ${a.name} | ${distance} | ${duration} | HR ${hr} | suffer:${score}`;
+  const desc = a.description ? ` — ${a.description}` : '';
+
+  return `${date} | ${a.sport_type} | ${a.name}${desc} | ${distance} | ${duration} | HR ${hr} | suffer:${score}`;
 }
 
 export function formatLapLine(lap: Lap, i: number): string {
