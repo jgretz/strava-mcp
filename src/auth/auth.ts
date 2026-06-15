@@ -48,7 +48,7 @@ export async function refreshAccessToken(token: AuthToken): Promise<Result<AuthT
     };
 
     cachedToken = refreshed;
-    const storeResult = writeStoredToken(refreshed);
+    const storeResult = await writeStoredToken(refreshed);
     if (!storeResult.ok) {
       console.warn(`Warning: ${storeResult.error}`);
     }
@@ -68,7 +68,7 @@ export async function getToken(): Promise<Result<AuthToken, string>> {
   }
 
   // 2. stored token
-  const stored = readStoredToken();
+  const stored = await readStoredToken();
   if (stored.ok) {
     if (!isExpired(stored.value)) {
       cachedToken = stored.value;

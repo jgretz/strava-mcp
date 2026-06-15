@@ -1,11 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, mock } from 'bun:test';
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs';
-import { join } from 'node:path';
-import { homedir } from 'node:os';
 import { getToken, clearToken, setToken } from '../../src/auth/auth.ts';
 import type { AuthToken } from '../../src/types.ts';
-
-const TOKEN_PATH = join(homedir(), '.config', 'strava-mcp', 'auth.json');
 
 function makeToken(overrides: Partial<AuthToken> = {}): AuthToken {
   return {
@@ -17,42 +12,29 @@ function makeToken(overrides: Partial<AuthToken> = {}): AuthToken {
   };
 }
 
-// save/restore the real token file so tests don't destroy user state
-let savedTokenContents: string | null = null;
-
-function backupTokenFile(): void {
-  if (existsSync(TOKEN_PATH)) {
-    savedTokenContents = readFileSync(TOKEN_PATH, 'utf-8');
-    unlinkSync(TOKEN_PATH);
-  }
-}
-
-function restoreTokenFile(): void {
-  if (savedTokenContents) {
-    writeFileSync(TOKEN_PATH, savedTokenContents, 'utf-8');
-    savedTokenContents = null;
-  }
-}
-
 describe('getToken', () => {
   const originalFetch = globalThis.fetch;
   const savedId = process.env.STRAVA_CLIENT_ID;
   const savedSecret = process.env.STRAVA_CLIENT_SECRET;
+  const savedDbUrl = process.env.DATABASE_URL;
 
   beforeEach(() => {
     clearToken();
-    backupTokenFile();
     delete process.env.STRAVA_CLIENT_ID;
     delete process.env.STRAVA_CLIENT_SECRET;
+    // No DATABASE_URL → the DB-backed store returns "no stored token",
+    // isolating these tests to the in-memory cache + refresh logic.
+    delete process.env.DATABASE_URL;
   });
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
-    restoreTokenFile();
     if (savedId) process.env.STRAVA_CLIENT_ID = savedId;
     else delete process.env.STRAVA_CLIENT_ID;
     if (savedSecret) process.env.STRAVA_CLIENT_SECRET = savedSecret;
     else delete process.env.STRAVA_CLIENT_SECRET;
+    if (savedDbUrl) process.env.DATABASE_URL = savedDbUrl;
+    else delete process.env.DATABASE_URL;
   });
 
   it('should return cached token when set and not expired', async () => {
@@ -89,11 +71,14 @@ describe('getToken', () => {
     process.env.STRAVA_CLIENT_SECRET = 'test-secret';
 
     globalThis.fetch = mock(async () => {
-      return new Response(JSON.stringify({
-        access_token: 'refreshed-token',
-        refresh_token: 'new-refresh',
-        expires_at: Math.floor(Date.now() / 1000) + 7200,
-      }), { status: 200 });
+      return new Response(
+        JSON.stringify({
+          access_token: 'refreshed-token',
+          refresh_token: 'new-refresh',
+          expires_at: Math.floor(Date.now() / 1000) + 7200,
+        }),
+        { status: 200 },
+      );
     }) as unknown as typeof fetch;
 
     const result = await getToken();
