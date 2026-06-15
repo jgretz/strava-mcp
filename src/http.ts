@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
 import { createServer } from './server.ts';
-import { bearerAuth } from './http/auth.ts';
+import { authGate, protectedResourceMetadata } from './http/auth.ts';
 import { exchangeCode } from './auth/oauth.ts';
 import { readClientCredentials, consumeOauthState } from './auth/store.ts';
 
@@ -17,6 +18,11 @@ function resultPage(message: string): string {
 }
 
 app.get('/ping', (c) => c.json({ alive: true }));
+
+// OAuth protected-resource metadata (RFC 9728) — public, so clients can
+// discover the authorization server.
+app.use('/.well-known/*', cors());
+app.get('/.well-known/oauth-protected-resource', (c) => c.json(protectedResourceMetadata()));
 
 // OAuth callback — Strava redirects the browser here after the user authorizes.
 // Intentionally NOT behind the bearer gate (the bearer middleware only covers
@@ -43,7 +49,7 @@ app.get('/oauth/callback', async (c) => {
   return c.html(resultPage(`Authenticated with Strava as ${result.value.athleteName}. You can close this window.`));
 });
 
-app.use('/mcp', bearerAuth);
+app.use('/mcp', authGate);
 
 // Stateless Streamable HTTP: a fresh server + transport per request.
 app.all('/mcp', async (c) => {

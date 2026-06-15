@@ -7,6 +7,8 @@ primary_region = 'ewr'
   NODE_ENV = "production"
   PORT = "3000"
   STRAVA_REDIRECT_URI = "https://joshgretz-strava-mcp.fly.dev/oauth/callback"
+  OAUTH_ISSUER = "https://joshgretz-mcp-auth.fly.dev"
+  MCP_RESOURCE = "https://joshgretz-strava-mcp.fly.dev/mcp"
 
 [http_service]
   internal_port = 3000

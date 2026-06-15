@@ -1,28 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, mock } from 'bun:test';
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs';
-import { join } from 'node:path';
-import { homedir } from 'node:os';
 import { setToken, clearToken } from '../../src/auth/auth.ts';
 import { stravaGet, stravaGetText } from '../../src/api/client.ts';
 import type { AuthToken } from '../../src/types.ts';
-
-const TOKEN_PATH = join(homedir(), '.config', 'strava-mcp', 'auth.json');
-
-let savedTokenContents: string | null = null;
-
-function backupTokenFile(): void {
-  if (existsSync(TOKEN_PATH)) {
-    savedTokenContents = readFileSync(TOKEN_PATH, 'utf-8');
-    unlinkSync(TOKEN_PATH);
-  }
-}
-
-function restoreTokenFile(): void {
-  if (savedTokenContents) {
-    writeFileSync(TOKEN_PATH, savedTokenContents, 'utf-8');
-    savedTokenContents = null;
-  }
-}
 
 const validToken: AuthToken = {
   accessToken: 'test-token',
@@ -34,23 +13,31 @@ const validToken: AuthToken = {
 const originalFetch = globalThis.fetch;
 const savedId = process.env.STRAVA_CLIENT_ID;
 const savedSecret = process.env.STRAVA_CLIENT_SECRET;
+const savedDbUrl = process.env.DATABASE_URL;
+
+// The "not authenticated" state requires no cached token, no client creds, and
+// no DB to read a stored token from. (bun test auto-loads .env, which may carry
+// real creds — clear them here for deterministic, offline tests.)
+function setUnauthedEnv() {
+  clearToken();
+  delete process.env.STRAVA_CLIENT_ID;
+  delete process.env.STRAVA_CLIENT_SECRET;
+  delete process.env.DATABASE_URL;
+}
+
+function restoreEnv() {
+  globalThis.fetch = originalFetch;
+  if (savedId) process.env.STRAVA_CLIENT_ID = savedId;
+  else delete process.env.STRAVA_CLIENT_ID;
+  if (savedSecret) process.env.STRAVA_CLIENT_SECRET = savedSecret;
+  else delete process.env.STRAVA_CLIENT_SECRET;
+  if (savedDbUrl) process.env.DATABASE_URL = savedDbUrl;
+  else delete process.env.DATABASE_URL;
+}
 
 describe('stravaGet', () => {
-  beforeEach(() => {
-    clearToken();
-    backupTokenFile();
-    delete process.env.STRAVA_CLIENT_ID;
-    delete process.env.STRAVA_CLIENT_SECRET;
-  });
-
-  afterEach(() => {
-    globalThis.fetch = originalFetch;
-    restoreTokenFile();
-    if (savedId) process.env.STRAVA_CLIENT_ID = savedId;
-    else delete process.env.STRAVA_CLIENT_ID;
-    if (savedSecret) process.env.STRAVA_CLIENT_SECRET = savedSecret;
-    else delete process.env.STRAVA_CLIENT_SECRET;
-  });
+  beforeEach(setUnauthedEnv);
+  afterEach(restoreEnv);
 
   it('should return error when not authenticated', async () => {
     const result = await stravaGet('/athlete');
@@ -105,21 +92,8 @@ describe('stravaGet', () => {
 });
 
 describe('stravaGetText', () => {
-  beforeEach(() => {
-    clearToken();
-    backupTokenFile();
-    delete process.env.STRAVA_CLIENT_ID;
-    delete process.env.STRAVA_CLIENT_SECRET;
-  });
-
-  afterEach(() => {
-    globalThis.fetch = originalFetch;
-    restoreTokenFile();
-    if (savedId) process.env.STRAVA_CLIENT_ID = savedId;
-    else delete process.env.STRAVA_CLIENT_ID;
-    if (savedSecret) process.env.STRAVA_CLIENT_SECRET = savedSecret;
-    else delete process.env.STRAVA_CLIENT_SECRET;
-  });
+  beforeEach(setUnauthedEnv);
+  afterEach(restoreEnv);
 
   it('should return error when not authenticated', async () => {
     const result = await stravaGetText('/routes/1/export_gpx');
