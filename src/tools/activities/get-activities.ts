@@ -7,7 +7,7 @@ import { formatActivityLine, capOutput, compactJson } from "../../format.ts";
 export const getActivities = defineTool({
   name: "get_activities",
   description:
-    "List recent Strava activities with pagination and date filtering.",
+    "List recent Strava activities with pagination and date filtering. Strava's list endpoint does not include activity descriptions; call get_activity_details with the activity ID to read one.",
   inputSchema: {
     page: z.number().optional().describe("Page number (default 1)"),
     perPage: z

@@ -1,4 +1,5 @@
 import type {
+  Activity,
   ActivitySummary,
   Lap,
   SegmentEffort,
@@ -20,7 +21,7 @@ export function capOutput(
 ): string {
   if (text.length <= max) return text;
   const truncated = text.length - max;
-  return `${text.slice(0, max)}\n... truncated (${truncated} chars). Use detail:'full' or narrow your query.`;
+  return `${text.slice(0, max)}\n... truncated (${truncated} chars). Narrow your query (fewer results or a lower detail level).`;
 }
 
 export function compactJson(data: unknown): string {
@@ -170,6 +171,50 @@ export function formatActivityLine(a: ActivitySummary): string {
   const desc = a.description ? ` — ${a.description}` : '';
 
   return `${date} | ${a.sport_type} | ${a.name}${desc} | ${distance} | ${duration} | HR ${hr} | suffer:${score}`;
+}
+
+const FOOT_SPORTS = new Set(["Run", "TrailRun", "VirtualRun", "Walk", "Hike"]);
+
+function formatActivityPace(a: Activity): string {
+  return FOOT_SPORTS.has(a.sport_type)
+    ? formatPace(a.average_speed)
+    : formatSpeed(a.average_speed);
+}
+
+function formatGear(gear: Gear | null): string | null {
+  if (!gear) return null;
+  const model = [gear.brand_name, gear.model_name].filter(Boolean).join(" ");
+  return model ? `Gear: ${gear.name} (${model})` : `Gear: ${gear.name}`;
+}
+
+// Header is fixed-size; the description is deliberately never truncated
+export function formatActivityDetail(a: Activity): string {
+  const date = new Date(a.start_date_local).toISOString().split("T")[0];
+  const hr = a.average_heartrate
+    ? `HR ${Math.round(a.average_heartrate)}/${a.max_heartrate ?? "-"}`
+    : "HR -";
+  const metrics = [
+    date,
+    a.sport_type,
+    formatDistance(a.distance),
+    `moving ${formatDuration(a.moving_time)} (elapsed ${formatDuration(a.elapsed_time)})`,
+    formatActivityPace(a),
+    `+${Math.round(a.total_elevation_gain)}m`,
+    hr,
+    `suffer:${a.suffer_score ?? "-"}`,
+    `${Math.round(a.calories ?? 0)}kcal`,
+  ].join(" | ");
+
+  const header = [
+    `## ${a.name} (${a.id})`,
+    metrics,
+    formatGear(a.gear),
+  ].filter(Boolean);
+
+  return `${header.join("\n")}
+
+### Description
+${a.description?.trim() || "(none)"}`;
 }
 
 export function formatLapLine(lap: Lap, i: number): string {

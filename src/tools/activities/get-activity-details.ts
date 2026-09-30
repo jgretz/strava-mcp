@@ -1,16 +1,16 @@
 import { z } from 'zod';
 import { defineTool } from '../types.ts';
 import { getActivity } from '../../api/activities.ts';
-import { mapActivity, toSummary } from './map-activity.ts';
-import { formatActivityLine, formatSplitLine, capOutput, compactJson } from '../../format.ts';
+import { toSummary } from './map-activity.ts';
+import { formatActivityLine, formatActivityDetail, formatSplitLine, capOutput, compactJson } from '../../format.ts';
 
 export const getActivityDetails = defineTool({
   name: 'get_activity_details',
   description:
-    'Get details of a Strava activity including gear, description, and all metrics.',
+    'Get a single Strava activity: metrics, gear, and the full untruncated description. Use this (not get_activities) whenever you need an activity description.',
   inputSchema: {
     activityId: z.number().describe('Strava activity ID'),
-    detail: z.enum(['basic', 'splits', 'full']).optional().describe('Level of detail: "basic" returns one-liner, "splits" adds splits section, "full" (default) returns all fields as JSON'),
+    detail: z.enum(['basic', 'splits', 'full', 'raw']).optional().describe('Level of detail: "full" (default) returns metrics, gear, and the complete description; "basic" returns a one-liner; "splits" adds per-km splits; "raw" returns the entire Strava JSON (large, truncated at 3000 chars)'),
   },
   async handler({ activityId, detail }) {
     const result = await getActivity(activityId);
@@ -23,6 +23,12 @@ export const getActivityDetails = defineTool({
 
     const level = detail ?? 'full';
     const activity = result.value;
+
+    if (level === 'full') {
+      return {
+        content: [{ type: 'text' as const, text: formatActivityDetail(activity) }],
+      };
+    }
 
     if (level === 'basic') {
       const summary = toSummary(activity);

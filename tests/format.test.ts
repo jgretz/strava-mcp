@@ -6,6 +6,7 @@ import {
   formatPace,
   formatSpeed,
   formatActivityLine,
+  formatActivityDetail,
   formatLapLine,
   formatSegmentEffortLine,
   formatGearLine,
@@ -19,6 +20,7 @@ import {
   formatStreamSummary,
 } from "../src/format.ts";
 import type {
+  Activity,
   ActivitySummary,
   Lap,
   SegmentEffort,
@@ -168,6 +170,77 @@ describe("formatActivityLine", () => {
 
     const result = formatActivityLine(activity);
     expect(result).not.toContain("—");
+  });
+});
+
+function makeActivity(overrides: Partial<Activity> = {}): Activity {
+  return {
+    id: 42,
+    name: "Morning Run",
+    sport_type: "Run",
+    start_date_local: "2024-01-15T08:00:00Z",
+    distance: 10000,
+    moving_time: 3000,
+    elapsed_time: 3100,
+    average_heartrate: 150,
+    max_heartrate: 175,
+    average_speed: 3.33,
+    total_elevation_gain: 80,
+    description: null,
+    suffer_score: 60,
+    calories: 700,
+    gear: null,
+    ...overrides,
+  } as Activity;
+}
+
+describe("formatActivityDetail", () => {
+  it("should include the full description when it exceeds the output cap", () => {
+    const description = "word ".repeat(1000).trim();
+
+    const result = formatActivityDetail(makeActivity({ description }));
+
+    expect(result.endsWith(description)).toBe(true);
+  });
+
+  it("should mark the description as none when it is null", () => {
+    const result = formatActivityDetail(makeActivity());
+
+    expect(result).toContain("### Description\n(none)");
+  });
+
+  it("should render pace for foot sports", () => {
+    const result = formatActivityDetail(makeActivity());
+
+    expect(result).toContain("5:00/km");
+  });
+
+  it("should render speed for non-foot sports", () => {
+    const result = formatActivityDetail(
+      makeActivity({ sport_type: "Ride", average_speed: 8 }),
+    );
+
+    expect(result).toContain("28.8km/h");
+  });
+
+  it("should render gear when present", () => {
+    const gear = {
+      name: "Daily",
+      brand_name: "Nike",
+      model_name: "Pegasus",
+    } as Activity["gear"];
+
+    const result = formatActivityDetail(makeActivity({ gear }));
+
+    expect(result).toContain("Gear: Daily (Nike Pegasus)");
+  });
+
+  it("should render the header metrics line", () => {
+    const result = formatActivityDetail(makeActivity());
+
+    expect(result).toContain(
+      "2024-01-15 | Run | 10.0km | moving 50m (elapsed 51m 40s) | 5:00/km | +80m | HR 150/175 | suffer:60 | 700kcal",
+    );
   });
 });
 
