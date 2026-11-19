@@ -35,10 +35,24 @@ describe.each(CASES)('%s id input', (_name, tool, field) => {
     expect(result.data?.[field]).toBe(ROUTE_ID);
   });
 
-  it(`should reject a number for ${tool.name}.${field}`, () => {
+  it(`should coerce a safe-integer number to a string for ${tool.name}.${field}`, () => {
+    const result = parse(tool, field, 21046819631);
+
+    expect(result.data?.[field]).toBe('21046819631');
+  });
+
+  it(`should reject a number above 2^53 for ${tool.name}.${field}`, () => {
     const result = parse(tool, field, Number(ROUTE_ID));
 
     expect(result.success).toBe(false);
+  });
+
+  it(`should reject a negative or fractional number for ${tool.name}.${field}`, () => {
+    const results = [-1, 1.5].map(function (v) {
+      return parse(tool, field, v).success;
+    });
+
+    expect(results).toEqual([false, false]);
   });
 
   it(`should reject a non-digit string for ${tool.name}.${field}`, () => {
