@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { defineTool } from '../types.ts';
+import { stravaIdSchema } from '../strava-id.ts';
 import { getActivityStreams as fetchActivityStreams } from '../../api/activities.ts';
 import { STREAM_KEYS } from '../../config.ts';
 import { formatStreamSummary, capOutput, compactJson } from '../../format.ts';
@@ -9,7 +10,7 @@ export const getActivityStreams = defineTool({
   description:
     'Get time-series stream data for a Strava activity (heart rate, power, cadence, altitude, etc).',
   inputSchema: {
-    activityId: z.number().describe('Strava activity ID'),
+    activityId: stravaIdSchema('activity'),
     keys: z
       .array(z.string())
       .optional()

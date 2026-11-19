@@ -5,7 +5,7 @@ export function getAthlete(): Promise<Result<Athlete, string>> {
   return stravaGet<Athlete>('/athlete');
 }
 
-export function getAthleteStats(athleteId: number): Promise<Result<AthleteStats, string>> {
+export function getAthleteStats(athleteId: string): Promise<Result<AthleteStats, string>> {
   return stravaGet<AthleteStats>(`/athletes/${athleteId}/stats`);
 }
 

@@ -124,7 +124,7 @@ describe("aggregation helpers", () => {
 describe("formatActivityLine", () => {
   it("formats activity summary as single line", () => {
     const activity: ActivitySummary = {
-      id: 1,
+      id: "1",
       name: "Morning Run",
       sport_type: "Run",
       start_date_local: "2024-01-15T08:00:00Z",
@@ -152,7 +152,7 @@ describe("formatActivityLine", () => {
 
   it("omits description when null", () => {
     const activity: ActivitySummary = {
-      id: 1,
+      id: "1",
       name: "Morning Run",
       sport_type: "Run",
       start_date_local: "2024-01-15T08:00:00Z",
@@ -326,6 +326,7 @@ describe("formatRouteLine", () => {
   it("formats route as single line", () => {
     const route: Route = {
       id: 1,
+      id_str: "1",
       name: "Morning Route",
       description: null,
       distance: 10000,
@@ -480,5 +481,45 @@ describe("formatStreamSummary", () => {
     const streams: Stream[] = [];
     const result = formatStreamSummary(streams);
     expect(result).toBe("No stream data available");
+  });
+});
+
+describe("64-bit ids", () => {
+  const ROUTE_ID = "3546500041732922368";
+
+  it("should show the exact id_str in the route line", () => {
+    const route = JSON.parse(
+      `{"id":${ROUTE_ID},"id_str":"${ROUTE_ID}","name":"Loop","distance":10000,"elevation_gain":200,"estimated_moving_time":1800}`,
+    ) as Route;
+
+    const result = formatRouteLine(route);
+
+    expect(result).toStartWith(`${ROUTE_ID} | Loop`);
+  });
+
+  it("should show the exact id_str in the activity detail header", () => {
+    const parsed = JSON.parse(`{"id":${ROUTE_ID},"id_str":"${ROUTE_ID}"}`);
+
+    const result = formatActivityDetail(makeActivity(parsed));
+
+    expect(result).toStartWith(`## Morning Run (${ROUTE_ID})`);
+  });
+
+  it("should show the summary id in the activity line", () => {
+    const summary = {
+      id: ROUTE_ID,
+      name: "Morning Run",
+      sport_type: "Run",
+      start_date_local: "2024-01-15T08:00:00Z",
+      distance: 5000,
+      moving_time: 1800,
+      average_heartrate: null,
+      description: null,
+      suffer_score: null,
+    } as ActivitySummary;
+
+    const result = formatActivityLine(summary);
+
+    expect(result).toStartWith(`${ROUTE_ID} | 2024-01-15`);
   });
 });

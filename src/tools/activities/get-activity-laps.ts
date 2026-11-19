@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { defineTool } from '../types.ts';
+import { stravaIdSchema } from '../strava-id.ts';
 import { getActivityLaps as fetchActivityLaps } from '../../api/activities.ts';
 import { formatLapLine, capOutput, compactJson } from '../../format.ts';
 
@@ -7,7 +8,7 @@ export const getActivityLaps = defineTool({
   name: 'get_activity_laps',
   description: 'Get lap data for a Strava activity.',
   inputSchema: {
-    activityId: z.number().describe('Strava activity ID'),
+    activityId: stravaIdSchema('activity'),
     detail: z.enum(['summary', 'full']).default('summary').describe('summary: one-liner per lap (default). full: complete lap data as compact JSON.'),
   },
   async handler({ activityId, detail }) {

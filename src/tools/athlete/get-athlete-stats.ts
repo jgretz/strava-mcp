@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { defineTool } from '../types.ts';
+import { stravaIdSchema } from '../strava-id.ts';
 import { getAthleteStats as fetchAthleteStats } from '../../api/athlete.ts';
 import {
   formatAthleteStatsSummary,
@@ -12,7 +13,7 @@ export const getAthleteStats = defineTool({
   description:
     'Get activity statistics for an athlete grouped by sport and time period.',
   inputSchema: {
-    athleteId: z.number().describe('Athlete ID (get from get_athlete_profile)'),
+    athleteId: stravaIdSchema('athlete'),
     detail: z
       .enum(['summary', 'full'])
       .default('summary')

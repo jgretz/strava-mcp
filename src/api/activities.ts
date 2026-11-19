@@ -17,21 +17,21 @@ export function listActivities(opts: ListActivitiesOpts = {}): Promise<Result<Ac
   return stravaGet<Activity[]>('/athlete/activities', params);
 }
 
-export function getActivity(id: number): Promise<Result<Activity, string>> {
+export function getActivity(id: string): Promise<Result<Activity, string>> {
   return stravaGet<Activity>(`/activities/${id}`);
 }
 
-export function getActivityStreams(id: number, keys: string[]): Promise<Result<Stream[], string>> {
+export function getActivityStreams(id: string, keys: string[]): Promise<Result<Stream[], string>> {
   return stravaGet<Stream[]>(`/activities/${id}/streams`, {
     keys: keys.join(','),
     key_type: 'time',
   });
 }
 
-export function getActivityLaps(id: number): Promise<Result<Lap[], string>> {
+export function getActivityLaps(id: string): Promise<Result<Lap[], string>> {
   return stravaGet<Lap[]>(`/activities/${id}/laps`);
 }
 
-export function updateActivity(id: number, data: UpdatableActivity): Promise<Result<Activity, string>> {
+export function updateActivity(id: string, data: UpdatableActivity): Promise<Result<Activity, string>> {
   return stravaPut<Activity>(`/activities/${id}`, data);
 }

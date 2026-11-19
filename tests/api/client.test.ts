@@ -7,7 +7,7 @@ const validToken: AuthToken = {
   accessToken: 'test-token',
   refreshToken: 'test-refresh',
   expiresAt: Math.floor(Date.now() / 1000) + 3600,
-  athleteId: 123,
+  athleteId: '123',
 };
 
 const originalFetch = globalThis.fetch;

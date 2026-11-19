@@ -1,13 +1,15 @@
 import { z } from 'zod';
 import { defineTool } from '../types.ts';
+import { stravaIdSchema } from '../strava-id.ts';
 import { getRoute as fetchRoute } from '../../api/routes.ts';
+import { withStringId } from '../../ids.ts';
 import { formatRouteLine, formatSegmentLine, capOutput, compactJson } from '../../format.ts';
 
 export const getRoute = defineTool({
   name: 'get_route',
   description: 'Get details about a Strava route.',
   inputSchema: {
-    routeId: z.number().describe('Strava route ID'),
+    routeId: stravaIdSchema('route'),
     detail: z.enum(['summary', 'full']).default('summary').describe('summary: one-liner with segments if present (default). full: complete route data as compact JSON.'),
   },
   async handler({ routeId, detail }) {
@@ -31,7 +33,7 @@ export const getRoute = defineTool({
     }
 
     return {
-      content: [{ type: 'text' as const, text: capOutput(compactJson(result.value)) }],
+      content: [{ type: 'text' as const, text: capOutput(compactJson(withStringId(result.value))) }],
     };
   },
 });
