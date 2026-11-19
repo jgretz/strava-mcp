@@ -7,7 +7,7 @@ function makeToken(overrides: Partial<AuthToken> = {}): AuthToken {
     accessToken: 'test-access',
     refreshToken: 'test-refresh',
     expiresAt: Math.floor(Date.now() / 1000) + 3600,
-    athleteId: 123,
+    athleteId: '123',
     ...overrides,
   };
 }

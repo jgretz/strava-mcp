@@ -8,14 +8,30 @@ export type AuthToken = {
   accessToken: string;
   refreshToken: string;
   expiresAt: number;
-  athleteId: number;
+  athleteId: string;
+};
+
+// Tokens persisted before 64-bit id support stored athleteId as a number
+export type StoredAuthToken = Omit<AuthToken, 'athleteId'> & {
+  athleteId: string | number;
+};
+
+// Strava ids may exceed 2^53, so JSON.parse can round the numeric `id`.
+// `id_str` carries the exact value and is what we expose and accept.
+export type StravaIds = {
+  id: number;
+  id_str: string;
+};
+
+// Output shape: the rounded numeric id is replaced by the exact string id
+export type WithStringId<T extends StravaIds> = Omit<T, 'id' | 'id_str'> & {
+  id: string;
 };
 
 export type LatLng = [number, number];
 
 // Strava domain types — full API fields
-export type Athlete = {
-  id: number;
+export type Athlete = StravaIds & {
   username: string | null;
   firstname: string;
   lastname: string;
@@ -48,8 +64,7 @@ export type Gear = {
   converted_distance: number;
 };
 
-export type Activity = {
-  id: number;
+export type Activity = StravaIds & {
   name: string;
   description: string | null;
   distance: number;
@@ -102,12 +117,11 @@ export type Activity = {
   laps: Lap[] | null;
   best_efforts: BestEffort[] | null;
   segment_efforts: SegmentEffort[] | null;
-  athlete: { id: number };
+  athlete: StravaIds;
   map: ActivityMap | null;
 };
 
-export type ActivitySummary = Pick<Activity,
-  | 'id'
+export type ActivitySummary = { id: string } & Pick<Activity,
   | 'name'
   | 'sport_type'
   | 'start_date_local'
@@ -257,8 +271,7 @@ export type Stream = {
   resolution: string;
 };
 
-export type Route = {
-  id: number;
+export type Route = StravaIds & {
   name: string;
   description: string | null;
   distance: number;

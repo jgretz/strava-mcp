@@ -12,6 +12,7 @@ import type {
   AthleteStats,
   ZoneRange,
 } from "./types.ts";
+import { exactId } from "./ids.ts";
 
 export const MAX_OUTPUT_CHARS = 3000;
 
@@ -170,7 +171,7 @@ export function formatActivityLine(a: ActivitySummary): string {
 
   const desc = a.description ? ` — ${a.description}` : '';
 
-  return `${date} | ${a.sport_type} | ${a.name}${desc} | ${distance} | ${duration} | HR ${hr} | suffer:${score}`;
+  return `${a.id} | ${date} | ${a.sport_type} | ${a.name}${desc} | ${distance} | ${duration} | HR ${hr} | suffer:${score}`;
 }
 
 const FOOT_SPORTS = new Set(["Run", "TrailRun", "VirtualRun", "Walk", "Hike"]);
@@ -206,7 +207,7 @@ export function formatActivityDetail(a: Activity): string {
   ].join(" | ");
 
   const header = [
-    `## ${a.name} (${a.id})`,
+    `## ${a.name} (${exactId(a)})`,
     metrics,
     formatGear(a.gear),
   ].filter(Boolean);
@@ -246,7 +247,7 @@ export function formatRouteLine(r: Route): string {
   const gain = Math.round(r.elevation_gain);
   const time = formatDuration(r.estimated_moving_time);
 
-  return `${r.name} | ${distance} | ${gain}m gain | ${time}`;
+  return `${exactId(r)} | ${r.name} | ${distance} | ${gain}m gain | ${time}`;
 }
 
 export function formatSegmentLine(s: Segment | ExploreSegment): string {

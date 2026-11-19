@@ -1,12 +1,12 @@
 import { pgTable, text, jsonb, timestamp } from 'drizzle-orm/pg-core';
-import type { AuthToken } from '../types.ts';
+import type { StoredAuthToken } from '../types.ts';
 
 // Single-row token store for the hosted Strava MCP. The MCP mints this token
 // via OAuth and rotates it on refresh; persisting it here lets it survive
 // machine restarts (fly machines are ephemeral) without re-authorizing.
 export const stravaTokens = pgTable('strava_tokens', {
   id: text('id').primaryKey(), // always 'default' — single-row table
-  token: jsonb('token').$type<AuthToken>().notNull(),
+  token: jsonb('token').$type<StoredAuthToken>().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 

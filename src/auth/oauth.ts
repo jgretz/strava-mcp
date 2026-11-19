@@ -10,7 +10,7 @@ type TokenResponse = {
   access_token: string;
   refresh_token: string;
   expires_at: number;
-  athlete: { id: number; firstname: string; lastname: string };
+  athlete: { id: number; id_str?: string; firstname: string; lastname: string };
 };
 
 export function buildAuthorizeUrl(clientId: string, redirectUri: string, state: string): string {
@@ -54,7 +54,8 @@ export async function exchangeCode(
       accessToken: data.access_token,
       refreshToken: data.refresh_token,
       expiresAt: data.expires_at,
-      athleteId: data.athlete.id,
+      // id_str is exact for 64-bit ids; String(id) is exact below 2^53
+      athleteId: data.athlete.id_str ?? String(data.athlete.id),
     };
 
     setToken(token);

@@ -1,10 +1,15 @@
 import { eq } from 'drizzle-orm';
 import { ok, err, formatError } from '../utils.ts';
-import type { Result, AuthToken } from '../types.ts';
+import type { Result, AuthToken, StoredAuthToken } from '../types.ts';
 import { getDb } from '../db/index.ts';
 import { stravaTokens, stravaOauthStates } from '../db/schema.ts';
 
 const TOKEN_ID = 'default';
+
+// Tokens written before 64-bit id support hold a numeric athleteId
+export function normalizeStoredToken(token: StoredAuthToken): AuthToken {
+  return { ...token, athleteId: String(token.athleteId) };
+}
 
 export async function readStoredToken(): Promise<Result<AuthToken, string>> {
   try {
@@ -19,7 +24,7 @@ export async function readStoredToken(): Promise<Result<AuthToken, string>> {
     if (!row.token.accessToken || !row.token.refreshToken) {
       return err('Stored token is malformed');
     }
-    return ok(row.token);
+    return ok(normalizeStoredToken(row.token));
   } catch (e) {
     return err(formatError('Failed to read stored token', e));
   }

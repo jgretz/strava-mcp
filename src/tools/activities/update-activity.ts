@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { defineTool } from '../types.ts';
+import { stravaIdSchema } from '../strava-id.ts';
 import { updateActivity as updateActivityApi } from '../../api/activities.ts';
-import { toSummary } from './map-activity.ts';
+import { toSummary, toActivityOutput } from './map-activity.ts';
 import type { UpdatableActivity } from '../../types.ts';
 import { formatActivityLine, capOutput, compactJson } from '../../format.ts';
 
@@ -15,7 +16,7 @@ export const updateActivity = defineTool({
     readOnlyHint: false,
   },
   inputSchema: {
-    activityId: z.number().describe('Strava activity ID'),
+    activityId: stravaIdSchema('activity'),
     name: z.string().optional().describe('New name for the activity'),
     description: z.string().optional().describe('New description for the activity'),
     sportType: z.string().optional().describe('Sport type (e.g. Run, Ride, Swim, Hike)'),
@@ -52,7 +53,7 @@ export const updateActivity = defineTool({
     }
 
     return {
-      content: [{ type: 'text' as const, text: capOutput(compactJson(result.value)) }],
+      content: [{ type: 'text' as const, text: capOutput(compactJson(toActivityOutput(result.value))) }],
     };
   },
 });

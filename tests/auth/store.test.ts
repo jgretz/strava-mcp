@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'bun:test';
-import { readClientCredentials } from '../../src/auth/store.ts';
+import { readClientCredentials, normalizeStoredToken } from '../../src/auth/store.ts';
 
 describe('readClientCredentials', () => {
   const originalId = process.env.STRAVA_CLIENT_ID;
@@ -47,5 +47,23 @@ describe('readClientCredentials', () => {
     if (!result.ok) {
       expect(result.error).toContain('STRAVA_CLIENT_SECRET');
     }
+  });
+});
+
+describe('normalizeStoredToken', () => {
+  it('should coerce a numeric athleteId from a legacy stored token to a string', () => {
+    const legacy = { accessToken: 'a', refreshToken: 'r', expiresAt: 1, athleteId: 123 };
+
+    const result = normalizeStoredToken(legacy);
+
+    expect(result.athleteId).toBe('123');
+  });
+
+  it('should keep a string athleteId unchanged', () => {
+    const token = { accessToken: 'a', refreshToken: 'r', expiresAt: 1, athleteId: '3546500041732922368' };
+
+    const result = normalizeStoredToken(token);
+
+    expect(result.athleteId).toBe('3546500041732922368');
   });
 });

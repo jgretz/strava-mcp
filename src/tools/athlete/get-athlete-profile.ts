@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { defineTool } from '../types.ts';
 import { getAthlete } from '../../api/athlete.ts';
+import { exactId, withStringId } from '../../ids.ts';
 import { capOutput, compactJson } from '../../format.ts';
 
 export const getAthleteProfile = defineTool({
@@ -20,7 +21,7 @@ export const getAthleteProfile = defineTool({
 
     if (detail === 'summary') {
       const a = result.value;
-      const text = `## ${a.firstname} ${a.lastname}
+      const text = `## ${a.firstname} ${a.lastname} (${exactId(a)})
 Location: ${a.city ?? '-'}, ${a.state ?? '-'}, ${a.country ?? '-'}
 Weight: ${a.weight ?? '-'}kg | FTP: ${a.ftp ?? '-'}w
 Premium: ${a.premium} | Summit: ${a.summit}
@@ -31,7 +32,7 @@ Bikes: ${a.bikes.length} | Shoes: ${a.shoes.length}`;
     }
 
     return {
-      content: [{ type: 'text' as const, text: capOutput(compactJson(result.value)) }],
+      content: [{ type: 'text' as const, text: capOutput(compactJson(withStringId(result.value))) }],
     };
   },
 });

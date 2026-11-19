@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { defineTool } from '../types.ts';
 import { listAthleteRoutes as fetchAthleteRoutes } from '../../api/routes.ts';
 import { getToken } from '../../auth/auth.ts';
+import { withStringId } from '../../ids.ts';
 import { formatRouteLine, capOutput, compactJson } from '../../format.ts';
 
 export const listAthleteRoutes = defineTool({
@@ -38,7 +39,7 @@ export const listAthleteRoutes = defineTool({
     }
 
     return {
-      content: [{ type: 'text' as const, text: capOutput(compactJson(result.value)) }],
+      content: [{ type: 'text' as const, text: capOutput(compactJson(result.value.map(withStringId))) }],
     };
   },
 });
